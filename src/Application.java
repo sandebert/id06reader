@@ -182,16 +182,11 @@ public class Application
 		}
 	}
 	
-	byte[] readSection(byte sector, byte[] key, CardChannel channel) throws Exception
+	byte[] readSection(byte sector, byte memoryKeyId, CardChannel channel) throws Exception
 	{
 		MemoryLayout memoryLayout = MemoryLayout.CLASSIC_1K;
 		
 		ByteBuffer buffer = ByteBuffer.allocate(4 * 16);
-		
-		// Load key
-		byte memoryKeyId = (byte)0x00;
-		
-		loadKey(key, memoryKeyId, channel);
 		
 		for (int i = 0; i <= memoryLayout.getTrailerBlockNumberForSector(sector); ++i)
 		{
@@ -271,9 +266,16 @@ public class Application
 					{
 						CardChannel channel = card.getBasicChannel();
 						
+						// Load key
+						byte keyAMemoryId = (byte)0x00;
+						loadKey(KEY_A, keyAMemoryId, channel);
+						
+						byte keyId06MemoryId = (byte)0x01;
+						loadKey(KEY_ID06USER, keyId06MemoryId, channel);
+						
 						String uid = readUID(channel);
 						
-						byte[] section1 = readSection((byte)0x01, KEY_A, channel);
+						byte[] section1 = readSection((byte)0x01, keyAMemoryId, channel);
 						System.out.print("Section 1: ");
 						dumpBytes(section1);
 						
@@ -282,7 +284,7 @@ public class Application
 						index += firstName.length() + 2; // 0 and length
 						String lastName = readString(index, 0, section1);
 						
-						byte[] section2 = readSection((byte)0x02, KEY_ID06USER, channel);
+						byte[] section2 = readSection((byte)0x02, keyId06MemoryId, channel);
 						System.out.print("Section 2: ");
 						dumpBytes(section2);
 						
@@ -294,13 +296,13 @@ public class Application
 						
 						String personalNumber = readString(34, 0, section2);
 						
-						byte[] section3 = readSection((byte)0x03, KEY_ID06USER, channel);
+						byte[] section3 = readSection((byte)0x03, keyId06MemoryId, channel);
 						System.out.print("Section 3: ");
 						dumpBytes(section3);
 						
 						String companyName = readString(0, 0, section3);
 						
-						byte[] section4 = readSection((byte)0x04, KEY_ID06USER, channel);
+						byte[] section4 = readSection((byte)0x04, keyId06MemoryId, channel);
 						System.out.print("Section 4: ");
 						dumpBytes(section4);
 						
@@ -310,13 +312,13 @@ public class Application
 						String speedDial = readString(16, 0, section4);
 						String companyUrl = readString(32, 0, section4);
 						
-						byte[] section5 = readSection((byte)0x05, KEY_ID06USER, channel);
+						byte[] section5 = readSection((byte)0x05, keyId06MemoryId, channel);
 						System.out.print("Section 5: ");
 						dumpBytes(section5);
 						String training = readString(0, 0, section5);
 						String relativePhone = readString(16, 0, section5);
 						
-						byte[] section6 = readSection((byte)0x06, KEY_ID06USER, channel);
+						byte[] section6 = readSection((byte)0x06, keyId06MemoryId, channel);
 						System.out.print("Section 6: ");
 						dumpBytes(section6);
 						//String relativePhone = readString(16, 0, section5);
