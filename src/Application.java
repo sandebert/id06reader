@@ -98,7 +98,7 @@ public class Application
 		return responseAPDU.getSW1() == 0x90 && responseAPDU.getSW2() == 0x00;
 	}
 	
-	boolean readUID(CardChannel channel) throws Exception
+	String readUID(CardChannel channel) throws Exception
 	{
 		byte[] uidCommand = { (byte)Apdu.CLS_PTS, (byte)Apdu.INS_GET_DATA, (byte)0x00, (byte)0x00, (byte)0x00 };
 		
@@ -111,14 +111,22 @@ public class Application
 			dumpBytes(r.getBytes());
 			System.out.print("UID: ");
 			dumpBytes(r.getData());
+			
+			String result = "";
+			byte[] data = r.getData();
+			
+			for (int i = 0; i < data.length; ++i)
+			{
+				result += String.format("%02X", data[i]);
+			}
+			
+			return result;
 		}
 		else
 		{
 			System.out.println("UID command failed");
-			return false;
+			return null;
 		}
-		
-		return true;
 	}
 	
 	boolean loadKey(byte key[], byte memoryKeyId, CardChannel channel) throws Exception
@@ -270,7 +278,7 @@ public class Application
 					{
 						CardChannel channel = card.getBasicChannel();
 						
-						readUID(channel);
+						String uid = readUID(channel);
 						
 						byte[] section1 = readSection((byte)0x01, KEY_A, channel);
 						System.out.print("Section 1: ");
@@ -307,7 +315,7 @@ public class Application
 						
 						String validity = readString(8, 8, section4);
 						String speedDial = readString(16, 0, section4);
-						String url = readString(32, 0, section4);
+						String companyUrl = readString(32, 0, section4);
 						
 						byte[] section5 = readSection((byte)0x05, KEY_ID06USER, channel);
 						System.out.print("Section 5: ");
@@ -320,7 +328,7 @@ public class Application
 						dumpBytes(section6);
 						//String relativePhone = readString(16, 0, section5);
 						
-						
+						System.out.println(uid);
 						System.out.println(firstName);
 						System.out.println(lastName);
 						
@@ -334,10 +342,14 @@ public class Application
 						System.out.println(lfSerial);
 						System.out.println(validity);
 						System.out.println(speedDial);
-						System.out.println(url);
+						System.out.println(companyUrl);
 						
 						System.out.println(training);
 						System.out.println(relativePhone);
+						
+						HttpConnection.sendPost(_url, uid, firstName, lastName, countryCode,
+								companyNumber, nationality, personalNumber, companyName,
+								lfSerial, validity, speedDial, companyUrl, training, relativePhone);
 					}
 					catch (Exception e)
 					{
