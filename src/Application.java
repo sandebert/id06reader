@@ -5,7 +5,7 @@ import javax.smartcardio.CommandAPDU;
 import javax.smartcardio.ResponseAPDU;
 import javax.smartcardio.TerminalFactory;
 
-import java.io.FileNotFoundException;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -34,16 +34,9 @@ public class Application
 			Properties prop = new Properties();
 			String propFileName = "config.properties";
  
-			inputStream = getClass().getClassLoader().getResourceAsStream(propFileName);
- 
-			if (inputStream != null)
-			{
-				prop.load(inputStream);
-			}
-			else
-			{
-				throw new FileNotFoundException("property file '" + propFileName + "' not found in the classpath");
-			}
+			inputStream = new FileInputStream(propFileName);
+
+			prop.load(inputStream);
 			
 			_url = prop.getProperty("url");
 			_readerId = Integer.parseInt(prop.getProperty("reader"));
