@@ -5,9 +5,12 @@ import javax.smartcardio.CommandAPDU;
 import javax.smartcardio.ResponseAPDU;
 import javax.smartcardio.TerminalFactory;
 
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.List;
+import java.util.Properties;
 
 public class Application
 {
@@ -16,14 +19,46 @@ public class Application
 	final byte KEY_A[] = { (byte)0xA0, (byte)0xA1, (byte)0xA2, (byte)0xA3, (byte)0xA4, (byte)0xA5 };
 	final byte KEY_ID06USER[] = { (byte)0x6E, (byte)0x77, (byte)0x47, (byte)0x39, (byte)0x4E, (byte)0x63 };
 	
-	private String _url;
+	private String _url = "";
+	private int _readerId = 0;
 	
 	private TerminalFactory _factory;
 	private CardTerminal _terminal;
 	
-	Application(String url, int terminalId) throws Exception
+	Application() throws Exception
 	{
-		_url = url;
+		InputStream inputStream = null;
+		
+		try
+		{
+			Properties prop = new Properties();
+			String propFileName = "config.properties";
+ 
+			inputStream = getClass().getClassLoader().getResourceAsStream(propFileName);
+ 
+			if (inputStream != null)
+			{
+				prop.load(inputStream);
+			}
+			else
+			{
+				throw new FileNotFoundException("property file '" + propFileName + "' not found in the classpath");
+			}
+			
+			_url = prop.getProperty("url");
+			_readerId = Integer.parseInt(prop.getProperty("reader"));
+		}
+		catch (Exception e)
+		{
+			System.out.println("Exception: " + e);
+		}
+		finally
+		{
+			if (inputStream != null)
+			{
+				inputStream.close();
+			}
+		}
 		
 		_factory = TerminalFactory.getDefault();
 		List<CardTerminal> terminals = _factory.terminals().list();
@@ -35,12 +70,12 @@ public class Application
 			throw new Exception("No card terminal found");
 		}
 		
-		if (terminalId < 0 || terminalId >= terminals.size())
+		if (_readerId < 0 || _readerId >= terminals.size())
 		{
 			throw new Exception("Invalid terminal index");
 		}
 
-		_terminal = terminals.get(terminalId);
+		_terminal = terminals.get(_readerId);
 	}
 	
 	public void dumpBytes(byte val[])

@@ -4,23 +4,11 @@ public class Main
 	{
 		System.out.println("Starting up");
 		
-		String url = "";
-		int readerId = 0;
-		
-		if (args.length >= 1)
-		{
-			url = args[0];
-		}
-		if (args.length >= 2)
-		{
-			readerId = Integer.parseInt(args[1]);
-		}
-		
 		Application app = null;
 		
 		try
 		{
-			app = new Application(url, readerId);
+			app = new Application();
 		}
 		catch (Exception e)
 		{
