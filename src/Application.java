@@ -280,9 +280,9 @@ public class Application
 						dumpBytes(section1);
 						
 						int index = 1; // length
-						String firstName = readString(index, 0, section1);
-						index += firstName.length() + 2; // 0 and length
 						String lastName = readString(index, 0, section1);
+						index += lastName.length() + 2; // 0 and length
+						String firstName = readString(index, 0, section1);
 						
 						byte[] section2 = readSection((byte)0x02, keyId06MemoryId, channel);
 						System.out.print("Section 2: ");
@@ -323,24 +323,24 @@ public class Application
 						dumpBytes(section6);
 						//String relativePhone = readString(16, 0, section5);
 						
-						System.out.println(uid);
-						System.out.println(firstName);
-						System.out.println(lastName);
+						System.out.println("UID: " + uid);
+						System.out.println("First name: " + firstName);
+						System.out.println("Last name: " + lastName);
 						
-						System.out.println(countryCode);
-						System.out.println(companyNumber);
-						System.out.println(nationality);
-						System.out.println(personalNumber);
+						System.out.println("Country code: " + countryCode);
+						System.out.println("Companyn umber: " + companyNumber);
+						System.out.println("Nationality: " + nationality);
+						System.out.println("Personal number: " + personalNumber);
 						
-						System.out.println(companyName);
+						System.out.println("Company name: " + companyName);
 						
-						System.out.println(lfSerial);
-						System.out.println(validity);
-						System.out.println(speedDial);
-						System.out.println(companyUrl);
+						System.out.println("LF serial: " + String.valueOf(lfSerial));
+						System.out.println("Validity: " + validity);
+						System.out.println("Speed dial: " + speedDial);
+						System.out.println("Company url: " + companyUrl);
 						
-						System.out.println(training);
-						System.out.println(relativePhone);
+						System.out.println("Training: " + training);
+						System.out.println("Pelative phone: " + relativePhone);
 						
 						HttpConnection.sendPost(_url, uid, firstName, lastName, countryCode,
 								companyNumber, nationality, personalNumber, companyName,
