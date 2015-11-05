@@ -71,21 +71,6 @@ public class Application
 		_terminal = terminals.get(_readerId);
 	}
 	
-	public void dumpBytes(byte val[])
-	{
-		for (int i = 0; i < val.length; ++i)
-		{
-			if (i != 0)
-			{
-				System.out.print(", ");
-			}
-
-			//System.out.print(val[i]);
-			System.out.print(String.format("%02X ", val[i]));
-		}
-		System.out.print("\n");
-	}
-	
 	public static boolean isSuccess(ResponseAPDU responseAPDU)
 	{
 		return responseAPDU.getSW1() == 0x90 && responseAPDU.getSW2() == 0x00;
@@ -101,9 +86,9 @@ public class Application
 		{
 			System.out.println("UID response: " + r);
 			System.out.print("Bytes: ");
-			dumpBytes(r.getBytes());
+			Utils.dumpBytes(r.getBytes());
 			System.out.print("UID: ");
-			dumpBytes(r.getData());
+			Utils.dumpBytes(r.getData());
 			
 			String result = "";
 			byte[] data = r.getData();
@@ -277,7 +262,7 @@ public class Application
 						
 						byte[] section1 = readSection((byte)0x01, keyAMemoryId, channel);
 						System.out.print("Section 1: ");
-						dumpBytes(section1);
+						Utils.dumpBytes(section1);
 						
 						int index = 1; // length
 						String lastName = readString(index, 0, section1);
@@ -286,7 +271,7 @@ public class Application
 						
 						byte[] section2 = readSection((byte)0x02, keyId06MemoryId, channel);
 						System.out.print("Section 2: ");
-						dumpBytes(section2);
+						Utils.dumpBytes(section2);
 						
 						String countryCode = readString(16, 2, section2);
 						
@@ -298,13 +283,13 @@ public class Application
 						
 						byte[] section3 = readSection((byte)0x03, keyId06MemoryId, channel);
 						System.out.print("Section 3: ");
-						dumpBytes(section3);
+						Utils.dumpBytes(section3);
 						
 						String companyName = readString(0, 0, section3);
 						
 						byte[] section4 = readSection((byte)0x04, keyId06MemoryId, channel);
 						System.out.print("Section 4: ");
-						dumpBytes(section4);
+						Utils.dumpBytes(section4);
 						
 						long lfSerial = readLong(0, section4);
 						
@@ -314,13 +299,13 @@ public class Application
 						
 						byte[] section5 = readSection((byte)0x05, keyId06MemoryId, channel);
 						System.out.print("Section 5: ");
-						dumpBytes(section5);
+						Utils.dumpBytes(section5);
 						String training = readString(0, 0, section5);
 						String relativePhone = readString(16, 0, section5);
 						
 						byte[] section6 = readSection((byte)0x06, keyId06MemoryId, channel);
 						System.out.print("Section 6: ");
-						dumpBytes(section6);
+						Utils.dumpBytes(section6);
 						//String relativePhone = readString(16, 0, section5);
 						
 						System.out.println("UID: " + uid);

@@ -4,11 +4,12 @@ public class Main
 	{
 		System.out.println("Starting up");
 		
-		Application app = null;
+		//Application app = null;
+		ComApplication app = null;
 		
 		try
 		{
-			app = new Application();
+			app = new ComApplication();
 		}
 		catch (Exception e)
 		{
