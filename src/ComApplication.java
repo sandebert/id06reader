@@ -1,18 +1,26 @@
 
-import java.io.BufferedReader;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.PrintStream;
 import java.util.Enumeration;
 
 import gnu.io.CommPortIdentifier;
 import gnu.io.SerialPort;
 
+// A - beep-beep-beep
+// B - beep
+// N - name of device
+// V - version of device
+// R - reset device
+// {STX}response{CR} - response
+// {ESC} - card removed
+
 public class ComApplication
 {
+	byte[] _buffer = new byte[100];
+	
 	public static final int TIMEOUTSECONDS = 2;
 	public static final int BAUD = 9600;
+	//public static final int BAUD = 19200;
 	
 	CommPortIdentifier _portId = null;
 	SerialPort _port = null;
@@ -58,18 +66,31 @@ public class ComApplication
 		System.out.println("Params set");
 	}
 	
+	public void sendCommand() throws Exception
+	{
+		//byte command[] = { (byte)0x3A, (byte)0x00, (byte)0x20, (byte)0x00, (byte)0x13 };
+		byte command[] = { (byte)0x41 };
+		_output.write(command);
+		_output.flush();
+		
+		System.out.println("Command sent");
+	}
+	
 	public void run() throws Exception
 	{
 		while (true)
 		{
 			if (_input.available() > 0)
 			{
-				byte[] buffer = new byte[100];
+				int len = _input.read(_buffer);
 				
-				int len = _input.read(buffer);
+				byte[] data = new byte[len];
+				System.arraycopy(_buffer, 0, data, 0, len);
 				
 				System.out.print("Data: ");
-				Utils.dumpBytes(buffer);
+				Utils.dumpBytes(data);
+				
+				sendCommand();
 			}
 			
 			Thread.sleep(1000);
