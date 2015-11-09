@@ -313,7 +313,7 @@ public class Application
 						System.out.println("Last name: " + lastName);
 						
 						System.out.println("Country code: " + countryCode);
-						System.out.println("Companyn umber: " + companyNumber);
+						System.out.println("Company number: " + companyNumber);
 						System.out.println("Nationality: " + nationality);
 						System.out.println("Personal number: " + personalNumber);
 						
@@ -325,7 +325,7 @@ public class Application
 						System.out.println("Company url: " + companyUrl);
 						
 						System.out.println("Training: " + training);
-						System.out.println("Pelative phone: " + relativePhone);
+						System.out.println("Relative phone: " + relativePhone);
 						
 						HttpConnection.sendPost(_url, uid, firstName, lastName, countryCode,
 								companyNumber, nationality, personalNumber, companyName,
