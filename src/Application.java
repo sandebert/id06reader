@@ -43,7 +43,7 @@ public class Application
 		}
 		catch (Exception e)
 		{
-			System.out.println("Exception: " + e);
+			throw e;
 		}
 		finally
 		{
@@ -54,21 +54,6 @@ public class Application
 		}
 		
 		_factory = TerminalFactory.getDefault();
-		List<CardTerminal> terminals = _factory.terminals().list();
-		
-		System.out.println("Terminals: " + terminals);
-		
-		if (terminals.isEmpty())
-		{
-			throw new Exception("No card terminal found");
-		}
-		
-		if (_readerId < 0 || _readerId >= terminals.size())
-		{
-			throw new Exception("Invalid terminal index");
-		}
-
-		_terminal = terminals.get(_readerId);
 	}
 	
 	public static boolean isSuccess(ResponseAPDU responseAPDU)
@@ -221,8 +206,36 @@ public class Application
 		return buffer.getLong();
 	}
 	
+	public void connect() throws Exception
+	{
+		while(_terminal == null)
+		{
+			List<CardTerminal> terminals = _factory.terminals().list();
+			
+			if (!terminals.isEmpty())
+			{
+				System.out.println("Terminals: " + terminals);
+				
+				if (_readerId < 0 || _readerId >= terminals.size())
+				{
+					throw new Exception("Invalid terminal index");
+				}
+
+				_terminal = terminals.get(_readerId);
+			}
+			else
+			{
+				Thread.sleep(1000);
+			}
+		}
+	}
+	
 	public void run() throws Exception
 	{
+		System.out.println("Connecting to terminal...");
+		
+		connect();
+		
 		while (true)
 		{
 			if (_terminal.waitForCardPresent(0))
@@ -334,6 +347,9 @@ public class Application
 					catch (Exception e)
 					{
 						e.printStackTrace();
+						
+						_terminal = null;
+						connect();
 					}
 					finally
 					{

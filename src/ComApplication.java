@@ -1,10 +1,10 @@
 
-import java.io.InputStream;
+/*import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Enumeration;
 
 import gnu.io.CommPortIdentifier;
-import gnu.io.SerialPort;
+import gnu.io.SerialPort;*/
 
 // A - beep-beep-beep
 // B - beep
@@ -16,7 +16,7 @@ import gnu.io.SerialPort;
 
 public class ComApplication
 {
-	byte[] _buffer = new byte[100];
+	/*byte[] _buffer = new byte[100];
 	
 	public static final int TIMEOUTSECONDS = 2;
 	public static final int BAUD = 9600;
@@ -95,5 +95,5 @@ public class ComApplication
 			
 			Thread.sleep(1000);
 		}
-	}
+	}*/
 }
