@@ -16,14 +16,6 @@ public class HttpConnection
 			String companyNumber, String nationality, String personalNumber, String companyName,
 			long lfSerial, String validity, String speedDial, String companyUrl, String training, String relativePhone) throws Exception
 	{
-		URL obj = new URL(url);
-		HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-
-		//add reuqest header
-		con.setRequestMethod("POST");
-		con.setRequestProperty("User-Agent", USER_AGENT);
-		con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
-		
 		Map<String,Object> params = new LinkedHashMap<>();
 		params.put("uid", uid);
         params.put("first_name", firstName);
@@ -52,6 +44,14 @@ public class HttpConnection
         }
         byte[] postDataBytes = postData.toString().getBytes("UTF-8");
         
+        URL obj = new URL(url + "?" + postData.toString());
+		HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+
+		//add request header
+		con.setRequestMethod("POST");
+		con.setRequestProperty("User-Agent", USER_AGENT);
+		con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
+		
 		// Send post request
 		con.setDoOutput(true);
 		DataOutputStream wr = new DataOutputStream(con.getOutputStream());
@@ -61,7 +61,7 @@ public class HttpConnection
 		
 		String postString = new String(postDataBytes);
 		int responseCode = con.getResponseCode();
-		System.out.println("Sending 'POST' request to URL: " + url);
+		System.out.println("Sending 'POST' request to URL: " + obj.toString());
 		System.out.println("Post parameters: " + postString);
 		System.out.println("Response Code: " + responseCode);
 

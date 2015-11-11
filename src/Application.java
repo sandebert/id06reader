@@ -208,6 +208,8 @@ public class Application
 	
 	public void connect() throws Exception
 	{
+		System.out.println("Connecting to terminal...");
+		
 		while(_terminal == null)
 		{
 			List<CardTerminal> terminals = _factory.terminals().list();
@@ -232,8 +234,6 @@ public class Application
 	
 	public void run() throws Exception
 	{
-		System.out.println("Connecting to terminal...");
-		
 		connect();
 		
 		while (true)
