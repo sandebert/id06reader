@@ -42,27 +42,27 @@ public class HttpConnection
             postData.append('=');
             postData.append(URLEncoder.encode(String.valueOf(param.getValue()), "UTF-8"));
         }
-        byte[] postDataBytes = postData.toString().getBytes("UTF-8");
+        //byte[] postDataBytes = postData.toString().getBytes("UTF-8");
         
         URL obj = new URL(url + "?" + postData.toString());
 		HttpURLConnection con = (HttpURLConnection) obj.openConnection();
 
 		//add request header
-		con.setRequestMethod("POST");
+		con.setRequestMethod("GET");
 		con.setRequestProperty("User-Agent", USER_AGENT);
 		con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
 		
 		// Send post request
-		con.setDoOutput(true);
+		/*con.setDoOutput(true);
 		DataOutputStream wr = new DataOutputStream(con.getOutputStream());
 		wr.write(postDataBytes);
 		wr.flush();
-		wr.close();
+		wr.close();*/
 		
-		String postString = new String(postDataBytes);
+		//String postString = new String(postDataBytes);
 		int responseCode = con.getResponseCode();
-		System.out.println("Sending 'POST' request to URL: " + obj.toString());
-		System.out.println("Post parameters: " + postString);
+		System.out.println("Sending request to URL: " + obj.toString());
+		//System.out.println("Post parameters: " + postString);
 		System.out.println("Response Code: " + responseCode);
 
 		BufferedReader in = new BufferedReader(

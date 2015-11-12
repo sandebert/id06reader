@@ -40,6 +40,9 @@ public class Application
 			
 			_url = prop.getProperty("url");
 			_readerId = Integer.parseInt(prop.getProperty("reader"));
+			
+			System.out.println("URL: " + _url);
+			System.out.println("Reader ID: " + String.valueOf(_readerId));
 		}
 		catch (Exception e)
 		{
