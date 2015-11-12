@@ -212,23 +212,29 @@ public class Application
 		
 		while(_terminal == null)
 		{
-			List<CardTerminal> terminals = _factory.terminals().list();
-			
-			if (!terminals.isEmpty())
+			try
 			{
-				System.out.println("Terminals: " + terminals);
+				List<CardTerminal> terminals = _factory.terminals().list();
 				
-				if (_readerId < 0 || _readerId >= terminals.size())
+				if (!terminals.isEmpty())
 				{
-					throw new Exception("Invalid terminal index");
+					System.out.println("Terminals: " + terminals);
+					
+					if (_readerId < 0 || _readerId >= terminals.size())
+					{
+						throw new Exception("Invalid terminal index");
+					}
+	
+					_terminal = terminals.get(_readerId);
+					break;
 				}
-
-				_terminal = terminals.get(_readerId);
 			}
-			else
+			catch (Exception e)
 			{
-				Thread.sleep(1000);
+				
 			}
+			
+			Thread.sleep(1000);
 		}
 	}
 	
