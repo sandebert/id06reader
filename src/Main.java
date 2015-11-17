@@ -1,8 +1,10 @@
 public class Main
 {
+	static String VERSION = "1.1";
+	
 	public static void main(String[] args)
 	{
-		System.out.println("Starting up");
+		System.out.println("ID06 reader v" + VERSION);
 		
 		Application app = null;
 		//ComApplication app = null;
