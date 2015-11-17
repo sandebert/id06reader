@@ -245,32 +245,18 @@ public class Application
 	{
 		connect();
 		
-		while (true)
+		try
 		{
-			if (_terminal.waitForCardPresent(0))
+			while (true)
 			{
-				Card card = null;
-				
-				try
+				if (_terminal.waitForCardPresent(0))
 				{
-					card = _terminal.connect("T=1");
-				}
-				catch (Exception e)
-				{
-					e.printStackTrace();
+					Card card = _terminal.connect("T=1");
 					
-					if (_terminal.waitForCardAbsent(0))
+					if (card != null)
 					{
-						System.out.println("Card disconnected");
-					}
-				}
-				
-				if (card != null)
-				{
-					System.out.println("Card connected " + card);
-					
-					try
-					{
+						System.out.println("Card connected " + card);
+						
 						CardChannel channel = card.getBasicChannel();
 						
 						// Load key
@@ -352,16 +338,7 @@ public class Application
 						HttpConnection.sendPost(_url, uid, firstName, lastName, countryCode,
 								companyNumber, nationality, personalNumber, companyName,
 								lfSerial, validity, speedDial, companyUrl, training, relativePhone);
-					}
-					catch (Exception e)
-					{
-						e.printStackTrace();
-						
-						_terminal = null;
-						connect();
-					}
-					finally
-					{
+					
 						card.disconnect(false);
 						
 						if (_terminal.waitForCardAbsent(0))
@@ -371,6 +348,17 @@ public class Application
 					}
 				}
 			}
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+			
+			if (_terminal != null)
+			{
+				_terminal = null;
+			}
+			
+			connect();
 		}
 	}
 }
