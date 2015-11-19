@@ -254,9 +254,9 @@ public class Application
 	
 	public void run() throws Exception
 	{	
-		try
+		while (true)
 		{
-			while (true)
+			try
 			{
 				if (_terminal == null)
 				{
@@ -379,14 +379,14 @@ public class Application
 					}
 				}
 			}
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
-			
-			if (_terminal != null)
+			catch (Exception e)
 			{
-				_terminal = null;
+				e.printStackTrace();
+				
+				if (_terminal != null)
+				{
+					_terminal = null;
+				}
 			}
 		}
 	}
