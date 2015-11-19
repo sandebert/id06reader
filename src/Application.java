@@ -1,6 +1,7 @@
 import javax.smartcardio.Card;
 import javax.smartcardio.CardChannel;
 import javax.smartcardio.CardTerminal;
+import javax.smartcardio.CardTerminals;
 import javax.smartcardio.CommandAPDU;
 import javax.smartcardio.ResponseAPDU;
 import javax.smartcardio.TerminalFactory;
@@ -22,7 +23,6 @@ public class Application
 	private String _url = "";
 	private int _readerId = 0;
 	
-	private TerminalFactory _factory;
 	private CardTerminal _terminal;
 	
 	Application() throws Exception
@@ -55,8 +55,6 @@ public class Application
 				inputStream.close();
 			}
 		}
-		
-		_factory = TerminalFactory.getDefault();
 	}
 	
 	public static boolean isSuccess(ResponseAPDU responseAPDU)
@@ -230,18 +228,23 @@ public class Application
 	{
 		try
 		{
-			List<CardTerminal> terminals = _factory.terminals().list();
+			TerminalFactory factory = TerminalFactory.getDefault();
+			CardTerminals terminals = factory.terminals();
+			//System.out.println("Got terminals");
 			
-			if (!terminals.isEmpty())
+			List<CardTerminal> terminalList = terminals.list();
+			//System.out.println("Got terminal list");
+			
+			if (!terminalList.isEmpty())
 			{
 				//System.out.println("Terminals: " + terminals);
 				
-				if (_readerId < 0 || _readerId >= terminals.size())
+				if (_readerId < 0 || _readerId >= terminalList.size())
 				{
 					throw new Exception("Invalid terminal index");
 				}
 
-				return terminals.get(_readerId);
+				return terminalList.get(_readerId);
 			}
 			else
 			{
@@ -250,21 +253,24 @@ public class Application
 		}
 		catch (Exception e)
 		{
-			
+			//e.printStackTrace();
 		}
 		
 		return null;
 	}
 	
 	public void run() throws Exception
-	{	
+	{
+		connect();
+		
 		while (true)
 		{
 			try
 			{
 				if (_terminal == null)
 				{
-					connect();
+					//connect();
+					return;
 				}
 				else
 				{
