@@ -215,134 +215,165 @@ public class Application
 		
 		while(_terminal == null)
 		{
-			try
+			_terminal = getTerminal();
+			
+			if (_terminal != null)
 			{
-				List<CardTerminal> terminals = _factory.terminals().list();
-				
-				if (!terminals.isEmpty())
-				{
-					System.out.println("Terminals: " + terminals);
-					
-					if (_readerId < 0 || _readerId >= terminals.size())
-					{
-						throw new Exception("Invalid terminal index");
-					}
-	
-					_terminal = terminals.get(_readerId);
-					break;
-				}
-			}
-			catch (Exception e)
-			{
-				
+				System.out.println("Connected to " + _terminal.getName());
 			}
 			
 			Thread.sleep(1000);
 		}
 	}
 	
-	public void run() throws Exception
+	private CardTerminal getTerminal()
 	{
-		connect();
+		try
+		{
+			List<CardTerminal> terminals = _factory.terminals().list();
+			
+			if (!terminals.isEmpty())
+			{
+				//System.out.println("Terminals: " + terminals);
+				
+				if (_readerId < 0 || _readerId >= terminals.size())
+				{
+					throw new Exception("Invalid terminal index");
+				}
+
+				return terminals.get(_readerId);
+			}
+		}
+		catch (Exception e)
+		{
+			
+		}
 		
+		return null;
+	}
+	
+	public void run() throws Exception
+	{	
 		try
 		{
 			while (true)
 			{
-				if (_terminal.waitForCardPresent(0))
+				if (_terminal == null)
 				{
-					Card card = _terminal.connect("T=1");
-					
-					if (card != null)
+					connect();
+				}
+				else
+				{
+					while (!_terminal.waitForCardPresent(1000))
 					{
-						System.out.println("Card connected " + card);
-						
-						CardChannel channel = card.getBasicChannel();
-						
-						// Load key
-						byte keyAMemoryId = (byte)0x00;
-						loadKey(KEY_A, keyAMemoryId, channel);
-						
-						byte keyId06MemoryId = (byte)0x01;
-						loadKey(KEY_ID06USER, keyId06MemoryId, channel);
-						
-						String uid = readUID(channel);
-						
-						byte[] section1 = readSection((byte)0x01, keyAMemoryId, channel);
-						System.out.print("Section 1: ");
-						Utils.dumpBytes(section1);
-						
-						int index = 1; // length
-						String lastName = readString(index, 0, section1);
-						index += lastName.length() + 2; // 0 and length
-						String firstName = readString(index, 0, section1);
-						
-						byte[] section2 = readSection((byte)0x02, keyId06MemoryId, channel);
-						System.out.print("Section 2: ");
-						Utils.dumpBytes(section2);
-						
-						String countryCode = readString(16, 2, section2);
-						
-						String companyNumber = readString(18, 0, section2);
-						
-						String nationality = readString(32, 2, section2);;
-						
-						String personalNumber = readString(34, 0, section2);
-						
-						byte[] section3 = readSection((byte)0x03, keyId06MemoryId, channel);
-						System.out.print("Section 3: ");
-						Utils.dumpBytes(section3);
-						
-						String companyName = readString(0, 0, section3);
-						
-						byte[] section4 = readSection((byte)0x04, keyId06MemoryId, channel);
-						System.out.print("Section 4: ");
-						Utils.dumpBytes(section4);
-						
-						long lfSerial = readLong(0, section4);
-						
-						String validity = readString(8, 8, section4);
-						String speedDial = readString(16, 0, section4);
-						String companyUrl = readString(32, 0, section4);
-						
-						byte[] section5 = readSection((byte)0x05, keyId06MemoryId, channel);
-						System.out.print("Section 5: ");
-						Utils.dumpBytes(section5);
-						String training = readString(0, 0, section5);
-						String relativePhone = readString(16, 0, section5);
-						
-						byte[] section6 = readSection((byte)0x06, keyId06MemoryId, channel);
-						System.out.print("Section 6: ");
-						Utils.dumpBytes(section6);
-						//String relativePhone = readString(16, 0, section5);
-						
-						System.out.println("UID: " + uid);
-						System.out.println("First name: " + firstName);
-						System.out.println("Last name: " + lastName);
-						
-						System.out.println("Country code: " + countryCode);
-						System.out.println("Company number: " + companyNumber);
-						System.out.println("Nationality: " + nationality);
-						System.out.println("Personal number: " + personalNumber);
-						
-						System.out.println("Company name: " + companyName);
-						
-						System.out.println("LF serial: " + String.valueOf(lfSerial));
-						System.out.println("Validity: " + validity);
-						System.out.println("Speed dial: " + speedDial);
-						System.out.println("Company url: " + companyUrl);
-						
-						System.out.println("Training: " + training);
-						System.out.println("Relative phone: " + relativePhone);
-						
-						HttpConnection.sendPost(_url, uid, firstName, lastName, countryCode,
-								companyNumber, nationality, personalNumber, companyName,
-								lfSerial, validity, speedDial, companyUrl, training, relativePhone);
-					
-						card.disconnect(false);
-						
-						if (_terminal.waitForCardAbsent(0))
+						if (_terminal != getTerminal())
 						{
+							_terminal = null;
+							break;
+						}
+					}
+					
+					if (_terminal != null)
+					{
+						Card card = _terminal.connect("T=1");
+						
+						if (card != null)
+						{
+							System.out.println("Card connected " + card);
+							
+							CardChannel channel = card.getBasicChannel();
+							
+							// Load key
+							byte keyAMemoryId = (byte)0x00;
+							loadKey(KEY_A, keyAMemoryId, channel);
+							
+							byte keyId06MemoryId = (byte)0x01;
+							loadKey(KEY_ID06USER, keyId06MemoryId, channel);
+							
+							String uid = readUID(channel);
+							
+							byte[] section1 = readSection((byte)0x01, keyAMemoryId, channel);
+							System.out.print("Section 1: ");
+							Utils.dumpBytes(section1);
+							
+							int index = 1; // length
+							String lastName = readString(index, 0, section1);
+							index += lastName.length() + 2; // 0 and length
+							String firstName = readString(index, 0, section1);
+							
+							byte[] section2 = readSection((byte)0x02, keyId06MemoryId, channel);
+							System.out.print("Section 2: ");
+							Utils.dumpBytes(section2);
+							
+							String countryCode = readString(16, 2, section2);
+							
+							String companyNumber = readString(18, 0, section2);
+							
+							String nationality = readString(32, 2, section2);;
+							
+							String personalNumber = readString(34, 0, section2);
+							
+							byte[] section3 = readSection((byte)0x03, keyId06MemoryId, channel);
+							System.out.print("Section 3: ");
+							Utils.dumpBytes(section3);
+							
+							String companyName = readString(0, 0, section3);
+							
+							byte[] section4 = readSection((byte)0x04, keyId06MemoryId, channel);
+							System.out.print("Section 4: ");
+							Utils.dumpBytes(section4);
+							
+							long lfSerial = readLong(0, section4);
+							
+							String validity = readString(8, 8, section4);
+							String speedDial = readString(16, 0, section4);
+							String companyUrl = readString(32, 0, section4);
+							
+							byte[] section5 = readSection((byte)0x05, keyId06MemoryId, channel);
+							System.out.print("Section 5: ");
+							Utils.dumpBytes(section5);
+							String training = readString(0, 0, section5);
+							String relativePhone = readString(16, 0, section5);
+							
+							byte[] section6 = readSection((byte)0x06, keyId06MemoryId, channel);
+							System.out.print("Section 6: ");
+							Utils.dumpBytes(section6);
+							//String relativePhone = readString(16, 0, section5);
+							
+							System.out.println("UID: " + uid);
+							System.out.println("First name: " + firstName);
+							System.out.println("Last name: " + lastName);
+							
+							System.out.println("Country code: " + countryCode);
+							System.out.println("Company number: " + companyNumber);
+							System.out.println("Nationality: " + nationality);
+							System.out.println("Personal number: " + personalNumber);
+							
+							System.out.println("Company name: " + companyName);
+							
+							System.out.println("LF serial: " + String.valueOf(lfSerial));
+							System.out.println("Validity: " + validity);
+							System.out.println("Speed dial: " + speedDial);
+							System.out.println("Company url: " + companyUrl);
+							
+							System.out.println("Training: " + training);
+							System.out.println("Relative phone: " + relativePhone);
+							
+							HttpConnection.sendData(_url, uid, firstName, lastName, countryCode,
+									companyNumber, nationality, personalNumber, companyName,
+									lfSerial, validity, speedDial, companyUrl, training, relativePhone);
+						
+							card.disconnect(false);
+							
+							while (_terminal != null && !_terminal.waitForCardAbsent(1000))
+							{
+								if (_terminal != getTerminal())
+								{
+									_terminal = null;
+									break;
+								}
+							}
+							
 							System.out.println("Card disconnected");
 						}
 					}
@@ -357,8 +388,6 @@ public class Application
 			{
 				_terminal = null;
 			}
-			
-			connect();
 		}
 	}
 }
