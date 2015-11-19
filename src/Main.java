@@ -1,6 +1,6 @@
 public class Main
 {
-	static String VERSION = "1.1";
+	static String VERSION = "1.2";
 	
 	public static void main(String[] args)
 	{

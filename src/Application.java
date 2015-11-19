@@ -213,7 +213,7 @@ public class Application
 	{
 		System.out.println("Connecting to terminal...");
 		
-		while(_terminal == null)
+		while (_terminal == null)
 		{
 			_terminal = getTerminal();
 			
@@ -242,6 +242,10 @@ public class Application
 				}
 
 				return terminals.get(_readerId);
+			}
+			else
+			{
+				System.out.println("No terminals connected");
 			}
 		}
 		catch (Exception e)
