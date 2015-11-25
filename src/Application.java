@@ -200,7 +200,7 @@ public class Application
 			{
 				if (data[i] == (byte)0x00)
 				{
-					realLength = i - start - 1;
+					realLength = i - start;
 					break;
 				}
 			}
@@ -216,9 +216,6 @@ public class Application
 				
 				//System.out.println("" + i + " - " + data[i]);
 			}
-			
-			System.out.print("String ");
-			Utils.dumpBytes(buffer);
 			
 			result.value = new String(buffer, Charset.forName("ISO-8859-15"));
 			result.dataLength = realLength;
