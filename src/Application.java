@@ -10,6 +10,7 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Properties;
 
@@ -24,6 +25,12 @@ public class Application
 	private int _readerId = 0;
 	
 	private CardTerminal _terminal;
+	
+	class StringValue
+	{
+		String value;
+		int dataLength;
+	}
 	
 	Application() throws Exception
 	{
@@ -179,20 +186,47 @@ public class Application
 		return buffer.array();
 	}
 	
-	String readString(int start, int length, byte[] data)
+	StringValue readString(int start, int length, byte[] data) throws Exception
 	{
-		String result = "";
+		StringValue result = new StringValue();
 		
-		int limit = (length == 0) ? data.length : start + length;
+		int realLength = length;
 		
-		for (int i = start; i < limit; ++i)
+		if (realLength == 0)
 		{
-			if (length == 0 && data[i] == 0x00)
+			realLength = data.length - start;
+			
+			for (int i = start; i < data.length - start; ++i)
 			{
-				break;
+				if (data[i] == (byte)0x00)
+				{
+					realLength = i - start - 1;
+					break;
+				}
+			}
+		}
+		
+		if (realLength > 0)
+		{
+			byte[] buffer = new byte[realLength];
+			
+			for (int i = start; i < start + realLength; ++i)
+			{				
+				buffer[i - start] = data[i];
+				
+				//System.out.println("" + i + " - " + data[i]);
 			}
 			
-			result += (char)data[i];
+			System.out.print("String ");
+			Utils.dumpBytes(buffer);
+			
+			result.value = new String(buffer, Charset.forName("ISO-8859-15"));
+			result.dataLength = realLength;
+		}
+		else
+		{
+			result.value = "";
+			result.dataLength = 0;
 		}
 		
 		return result;
@@ -307,27 +341,30 @@ public class Application
 							Utils.dumpBytes(section1);
 							
 							int index = 1; // length
-							String lastName = readString(index, 0, section1);
-							index += lastName.length() + 2; // 0 and length
-							String firstName = readString(index, 0, section1);
+							StringValue lastNameValue = readString(index, 0, section1);
+							String lastName = lastNameValue.value;
+							index += lastNameValue.dataLength + 2; // 0 and length
+
+							StringValue firstNameValue = readString(index, 0, section1);
+							String firstName = firstNameValue.value;
 							
 							byte[] section2 = readSection((byte)0x02, keyId06MemoryId, channel);
 							System.out.print("Section 2: ");
 							Utils.dumpBytes(section2);
 							
-							String countryCode = readString(16, 2, section2);
+							String countryCode = readString(16, 2, section2).value;
 							
-							String companyNumber = readString(18, 0, section2);
+							String companyNumber = readString(18, 0, section2).value;
 							
-							String nationality = readString(32, 2, section2);;
+							String nationality = readString(32, 2, section2).value;
 							
-							String personalNumber = readString(34, 0, section2);
+							String personalNumber = readString(34, 0, section2).value;
 							
 							byte[] section3 = readSection((byte)0x03, keyId06MemoryId, channel);
 							System.out.print("Section 3: ");
 							Utils.dumpBytes(section3);
 							
-							String companyName = readString(0, 0, section3);
+							String companyName = readString(0, 0, section3).value;
 							
 							byte[] section4 = readSection((byte)0x04, keyId06MemoryId, channel);
 							System.out.print("Section 4: ");
@@ -335,15 +372,15 @@ public class Application
 							
 							long lfSerial = readLong(0, section4);
 							
-							String validity = readString(8, 8, section4);
-							String speedDial = readString(16, 0, section4);
-							String companyUrl = readString(32, 0, section4);
+							String validity = readString(8, 8, section4).value;
+							String speedDial = readString(16, 0, section4).value;
+							String companyUrl = readString(32, 0, section4).value;
 							
 							byte[] section5 = readSection((byte)0x05, keyId06MemoryId, channel);
 							System.out.print("Section 5: ");
 							Utils.dumpBytes(section5);
-							String training = readString(0, 0, section5);
-							String relativePhone = readString(16, 0, section5);
+							String training = readString(0, 0, section5).value;
+							String relativePhone = readString(16, 0, section5).value;
 							
 							byte[] section6 = readSection((byte)0x06, keyId06MemoryId, channel);
 							System.out.print("Section 6: ");
